@@ -12,10 +12,13 @@ import {
 } from '@/components/ui/select';
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogOverlay,
+  DialogPortal,
 } from '@/components/ui/dialog';
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { cn } from "@/lib/utils";
 import { X, Save, Star, Bell } from 'lucide-react';
 
 interface NoteEditorProps {
@@ -81,7 +84,14 @@ export const NoteEditor = ({ note, categories, isOpen, onClose, onSave }: NoteEd
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col" onKeyDown={handleKeyDown}>
+      <DialogPortal>
+        <DialogOverlay />
+        <DialogPrimitive.Content
+          className={cn(
+            "fixed left-[50%] top-[50%] z-50 grid w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg max-h-[90vh] flex flex-col"
+          )}
+          onKeyDown={handleKeyDown}
+        >
         <DialogHeader className="flex-shrink-0">
           <div className="flex items-center justify-between">
             <DialogTitle>
@@ -171,7 +181,8 @@ export const NoteEditor = ({ note, categories, isOpen, onClose, onSave }: NoteEd
         <div className="flex-shrink-0 text-xs text-muted-foreground">
           Press Ctrl/Cmd + S to save • Press Esc to close
         </div>
-      </DialogContent>
+        </DialogPrimitive.Content>
+      </DialogPortal>
     </Dialog>
   );
 };
