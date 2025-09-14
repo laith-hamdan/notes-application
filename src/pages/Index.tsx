@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 const Index = () => {
   const {
     notes,
+    allNotes,
     categories,
     searchQuery,
     setSearchQuery,
@@ -36,18 +37,29 @@ const Index = () => {
     setIsEditorOpen(true);
   };
 
-  const handleSaveNote = (title: string, content: string, category: string) => {
+  const handleSaveNote = (title: string, content: string, category: string, isImportant?: boolean, reminderDate?: Date) => {
     if (editingNote) {
-      updateNote(editingNote.id, { title, content, category });
+      updateNote(editingNote.id, { title, content, category, isImportant, reminderDate });
       toast({
         title: "Note updated",
         description: "Your note has been saved successfully.",
       });
     } else {
-      createNote(title, content, category);
+      createNote(title, content, category, isImportant, reminderDate);
       toast({
         title: "Note created",
         description: "Your new note has been created successfully.",
+      });
+    }
+  };
+
+  const handleToggleImportant = (id: string) => {
+    const note = allNotes.find(n => n.id === id);
+    if (note) {
+      updateNote(id, { isImportant: !note.isImportant });
+      toast({
+        title: note.isImportant ? "Removed from Important" : "Marked as Important",
+        description: `Note ${note.isImportant ? 'unmarked' : 'marked'} as important.`,
       });
     }
   };
@@ -62,7 +74,7 @@ const Index = () => {
   };
 
   const noteCounts = categories.reduce((acc, category) => {
-    acc[category.id] = notes.filter(note => note.category === category.id).length;
+    acc[category.id] = allNotes.filter(note => note.category === category.id).length;
     return acc;
   }, {} as Record<string, number>);
 
@@ -134,6 +146,7 @@ const Index = () => {
                 categories={categories}
                 onEdit={handleEditNote}
                 onDelete={handleDeleteNote}
+                onToggleImportant={handleToggleImportant}
               />
             ))}
           </div>

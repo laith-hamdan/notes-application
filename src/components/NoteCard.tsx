@@ -2,7 +2,7 @@ import { Note, NoteCategory } from '@/types/note';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, Star, Bell } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,9 +15,10 @@ interface NoteCardProps {
   categories: NoteCategory[];
   onEdit: (note: Note) => void;
   onDelete: (id: string) => void;
+  onToggleImportant: (id: string) => void;
 }
 
-export const NoteCard = ({ note, categories, onEdit, onDelete }: NoteCardProps) => {
+export const NoteCard = ({ note, categories, onEdit, onDelete, onToggleImportant }: NoteCardProps) => {
   const category = categories.find(cat => cat.id === note.category);
   
   const formatDate = (date: Date) => {
@@ -35,14 +36,22 @@ export const NoteCard = ({ note, categories, onEdit, onDelete }: NoteCardProps) 
   };
 
   return (
-    <Card className="group relative bg-card shadow-note hover:shadow-hover transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+    <Card className={`group relative bg-card shadow-note hover:shadow-hover transition-all duration-300 hover:-translate-y-1 cursor-pointer ${note.isImportant ? 'ring-2 ring-primary/20' : ''}`}
           onClick={() => onEdit(note)}>
       <div className="p-6">
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-lg text-foreground truncate">
-              {note.title}
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-lg text-foreground truncate">
+                {note.title}
+              </h3>
+              {note.isImportant && (
+                <Star className="h-4 w-4 text-primary fill-primary flex-shrink-0" />
+              )}
+              {note.reminderDate && (
+                <Bell className="h-4 w-4 text-accent flex-shrink-0" />
+              )}
+            </div>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
@@ -55,6 +64,13 @@ export const NoteCard = ({ note, categories, onEdit, onDelete }: NoteCardProps) 
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={(e) => {
+                e.stopPropagation();
+                onToggleImportant(note.id);
+              }}>
+                <Star className={`h-4 w-4 mr-2 ${note.isImportant ? 'fill-primary' : ''}`} />
+                {note.isImportant ? 'Unmark Important' : 'Mark Important'}
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={(e) => {
                 e.stopPropagation();
                 onEdit(note);

@@ -16,37 +16,57 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { X, Save } from 'lucide-react';
+import { X, Save, Star, Bell } from 'lucide-react';
 
 interface NoteEditorProps {
   note?: Note;
   categories: NoteCategory[];
   isOpen: boolean;
   onClose: () => void;
-  onSave: (title: string, content: string, category: string) => void;
+  onSave: (title: string, content: string, category: string, isImportant?: boolean, reminderDate?: Date) => void;
 }
 
 export const NoteEditor = ({ note, categories, isOpen, onClose, onSave }: NoteEditorProps) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [category, setCategory] = useState('personal');
+  const [isImportant, setIsImportant] = useState(false);
+  const [reminderDate, setReminderDate] = useState('');
+  const [reminderTime, setReminderTime] = useState('');
 
   useEffect(() => {
     if (note) {
       setTitle(note.title);
       setContent(note.content);
       setCategory(note.category);
+      setIsImportant(note.isImportant || false);
+      if (note.reminderDate) {
+        const date = new Date(note.reminderDate);
+        setReminderDate(date.toISOString().split('T')[0]);
+        setReminderTime(date.toTimeString().slice(0, 5));
+      } else {
+        setReminderDate('');
+        setReminderTime('');
+      }
     } else {
       setTitle('');
       setContent('');
       setCategory('personal');
+      setIsImportant(false);
+      setReminderDate('');
+      setReminderTime('');
     }
   }, [note, isOpen]);
 
   const handleSave = () => {
     if (!title.trim() && !content.trim()) return;
     
-    onSave(title.trim() || 'Untitled Note', content, category);
+    let reminder: Date | undefined;
+    if (reminderDate && reminderTime) {
+      reminder = new Date(`${reminderDate}T${reminderTime}`);
+    }
+    
+    onSave(title.trim() || 'Untitled Note', content, category, isImportant, reminder);
     onClose();
   };
 
@@ -106,6 +126,38 @@ export const NoteEditor = ({ note, categories, isOpen, onClose, onSave }: NoteEd
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          
+          <div className="flex gap-4 items-center">
+            <Button
+              type="button"
+              variant={isImportant ? "default" : "outline"}
+              size="sm"
+              onClick={() => setIsImportant(!isImportant)}
+              className="gap-2"
+            >
+              <Star className={`h-4 w-4 ${isImportant ? 'fill-current' : ''}`} />
+              {isImportant ? 'Important' : 'Mark Important'}
+            </Button>
+            
+            <div className="flex items-center gap-2">
+              <Bell className="h-4 w-4 text-muted-foreground" />
+              <Input
+                type="date"
+                value={reminderDate}
+                onChange={(e) => setReminderDate(e.target.value)}
+                className="w-auto"
+                placeholder="Reminder date"
+              />
+              <Input
+                type="time"
+                value={reminderTime}
+                onChange={(e) => setReminderTime(e.target.value)}
+                className="w-auto"
+                placeholder="Time"
+                disabled={!reminderDate}
+              />
+            </div>
           </div>
           
           <Textarea

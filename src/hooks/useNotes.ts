@@ -25,12 +25,43 @@ export const useNotes = () => {
         ...note,
         createdAt: new Date(note.createdAt),
         updatedAt: new Date(note.updatedAt),
+        reminderDate: note.reminderDate ? new Date(note.reminderDate) : undefined,
       }));
       setNotes(parsedNotes);
     }
     
     if (savedCategories) {
       setCategories(JSON.parse(savedCategories));
+    }
+  }, []);
+
+  // Check for due reminders
+  useEffect(() => {
+    const checkReminders = () => {
+      const now = new Date();
+      notes.forEach(note => {
+        if (note.reminderDate && note.reminderDate <= now) {
+          // Show notification
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification(`Reminder: ${note.title}`, {
+              body: note.content.slice(0, 100) + (note.content.length > 100 ? '...' : ''),
+              icon: '/favicon.ico'
+            });
+          }
+          // Remove the reminder after showing
+          updateNote(note.id, { reminderDate: undefined });
+        }
+      });
+    };
+
+    const interval = setInterval(checkReminders, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, [notes]);
+
+  // Request notification permission on mount
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
     }
   }, []);
 
@@ -44,7 +75,7 @@ export const useNotes = () => {
     localStorage.setItem(CATEGORIES_KEY, JSON.stringify(newCategories));
   };
 
-  const createNote = (title: string, content: string, category: string): Note => {
+  const createNote = (title: string, content: string, category: string, isImportant?: boolean, reminderDate?: Date): Note => {
     const newNote: Note = {
       id: Date.now().toString(),
       title: title || 'Untitled Note',
@@ -52,6 +83,8 @@ export const useNotes = () => {
       category,
       createdAt: new Date(),
       updatedAt: new Date(),
+      isImportant,
+      reminderDate,
     };
 
     saveNotes([newNote, ...notes]);
@@ -77,10 +110,16 @@ export const useNotes = () => {
                          note.content.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || note.category === selectedCategory;
     return matchesSearch && matchesCategory;
+  }).sort((a, b) => {
+    // Sort important notes first
+    if (a.isImportant && !b.isImportant) return -1;
+    if (!a.isImportant && b.isImportant) return 1;
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
   });
 
   return {
     notes: filteredNotes,
+    allNotes: notes, // Add this to fix category counter bug
     categories,
     searchQuery,
     setSearchQuery,

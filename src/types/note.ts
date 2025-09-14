@@ -5,6 +5,8 @@ export interface Note {
   category: string;
   createdAt: Date;
   updatedAt: Date;
+  isImportant?: boolean;
+  reminderDate?: Date;
 }
 
 export interface NoteCategory {
