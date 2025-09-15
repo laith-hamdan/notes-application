@@ -1,3 +1,5 @@
+Hi I'm Laith, this is simple and modern app to create, organize, and manage your personal notes, ideas, and work in one place.
+
 **Use your preferred IDE**
 
 
