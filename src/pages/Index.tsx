@@ -148,10 +148,12 @@ const Index = () => {
                     : 'No notes match your current search criteria.'
                   }
                 </p>
-                <Button onClick={handleCreateNote} size="lg" className="gap-2 bg-gradient-primary">
-                  <PlusCircle className="h-5 w-5" />
-                  Create New Note
-                </Button>
+                {selectedCategory === 'all' && (
+                  <Button onClick={handleCreateNote} size="lg" className="gap-2 bg-gradient-primary">
+                    <PlusCircle className="h-5 w-5" />
+                    Create New Note
+                  </Button>
+                )}
               </>
             )}
           </div>
