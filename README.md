@@ -1,7 +1,4 @@
-Hi I'm Laith, this is simple and modern app to create, organize, and manage your personal notes, ideas, and work in one place.
-
-**Use your preferred IDE**
-
+## Hi I'm Laith, this is simple and modern app to create, organize, and manage your personal notes, ideas, and work in one place.
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
