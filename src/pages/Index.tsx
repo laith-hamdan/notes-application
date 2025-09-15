@@ -128,14 +128,32 @@ const Index = () => {
             <div className="p-4 bg-gradient-primary/10 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
               <BookOpen className="h-10 w-10 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">No notes yet</h3>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Start capturing your thoughts and ideas. Your first note is just a click away!
-            </p>
-            <Button onClick={handleCreateNote} size="lg" className="gap-2 bg-gradient-primary">
-              <PlusCircle className="h-5 w-5" />
-              Create Your First Note
-            </Button>
+            {allNotes.length === 0 ? (
+              <>
+                <h3 className="text-xl font-semibold mb-2">No notes yet</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  Start capturing your thoughts and ideas. Your first note is just a click away!
+                </p>
+                <Button onClick={handleCreateNote} size="lg" className="gap-2 bg-gradient-primary">
+                  <PlusCircle className="h-5 w-5" />
+                  Create Your First Note
+                </Button>
+              </>
+            ) : (
+              <>
+                <h3 className="text-xl font-semibold mb-2">No notes in this category</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  {selectedCategory !== 'all' 
+                    ? `No notes found in the ${categories.find(cat => cat.id === selectedCategory)?.name || 'selected'} category yet.`
+                    : 'No notes match your current search criteria.'
+                  }
+                </p>
+                <Button onClick={handleCreateNote} size="lg" className="gap-2 bg-gradient-primary">
+                  <PlusCircle className="h-5 w-5" />
+                  Create New Note
+                </Button>
+              </>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
