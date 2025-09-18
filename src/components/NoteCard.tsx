@@ -42,7 +42,7 @@ export const NoteCard = ({ note, categories, onEdit, onDelete, onToggleImportant
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-lg text-foreground truncate">
+              <h3 className={`font-semibold text-lg text-foreground truncate ${note.isChecked ? 'line-through opacity-60' : ''}`}>
                 {note.title}
               </h3>
               {note.isImportant && (
@@ -93,7 +93,7 @@ export const NoteCard = ({ note, categories, onEdit, onDelete, onToggleImportant
         </div>
         
         {note.content && (
-          <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
+          <p className={`text-muted-foreground text-sm mb-4 leading-relaxed ${note.isChecked ? 'line-through opacity-60' : ''}`}>
             {getPreview(note.content)}
           </p>
         )}

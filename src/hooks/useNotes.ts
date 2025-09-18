@@ -75,7 +75,7 @@ export const useNotes = () => {
     localStorage.setItem(CATEGORIES_KEY, JSON.stringify(newCategories));
   };
 
-  const createNote = (title: string, content: string, category: string, isImportant?: boolean, reminderDate?: Date): Note => {
+  const createNote = (title: string, content: string, category: string, isImportant?: boolean, reminderDate?: Date, isChecked?: boolean): Note => {
     const newNote: Note = {
       id: Date.now().toString(),
       title: title || 'Untitled Note',
@@ -85,6 +85,7 @@ export const useNotes = () => {
       updatedAt: new Date(),
       isImportant,
       reminderDate,
+      isChecked,
     };
 
     saveNotes([newNote, ...notes]);

@@ -7,6 +7,7 @@ export interface Note {
   updatedAt: Date;
   isImportant?: boolean;
   reminderDate?: Date;
+  isChecked?: boolean;
 }
 
 export interface NoteCategory {

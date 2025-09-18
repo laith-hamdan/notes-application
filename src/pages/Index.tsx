@@ -37,15 +37,15 @@ const Index = () => {
     setIsEditorOpen(true);
   };
 
-  const handleSaveNote = (title: string, content: string, category: string, isImportant?: boolean, reminderDate?: Date) => {
+  const handleSaveNote = (title: string, content: string, category: string, isImportant?: boolean, reminderDate?: Date, isChecked?: boolean) => {
     if (editingNote) {
-      updateNote(editingNote.id, { title, content, category, isImportant, reminderDate });
+      updateNote(editingNote.id, { title, content, category, isImportant, reminderDate, isChecked });
       toast({
         title: "Note updated",
         description: "Your note has been saved successfully.",
       });
     } else {
-      createNote(title, content, category, isImportant, reminderDate);
+      createNote(title, content, category, isImportant, reminderDate, isChecked);
       toast({
         title: "Note created",
         description: "Your new note has been created successfully.",
@@ -179,6 +179,7 @@ const Index = () => {
           isOpen={isEditorOpen}
           onClose={() => setIsEditorOpen(false)}
           onSave={handleSaveNote}
+          onDelete={handleDeleteNote}
         />
       </div>
     </div>

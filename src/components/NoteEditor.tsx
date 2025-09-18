@@ -19,21 +19,23 @@ import {
 } from '@/components/ui/dialog';
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
-import { X, Save, Star, Bell } from 'lucide-react';
+import { X, Save, Star, Bell, Check, Trash2 } from 'lucide-react';
 
 interface NoteEditorProps {
   note?: Note;
   categories: NoteCategory[];
   isOpen: boolean;
   onClose: () => void;
-  onSave: (title: string, content: string, category: string, isImportant?: boolean, reminderDate?: Date) => void;
+  onSave: (title: string, content: string, category: string, isImportant?: boolean, reminderDate?: Date, isChecked?: boolean) => void;
+  onDelete?: (id: string) => void;
 }
 
-export const NoteEditor = ({ note, categories, isOpen, onClose, onSave }: NoteEditorProps) => {
+export const NoteEditor = ({ note, categories, isOpen, onClose, onSave, onDelete }: NoteEditorProps) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [category, setCategory] = useState('personal');
   const [isImportant, setIsImportant] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
   const [reminderDate, setReminderDate] = useState('');
   const [reminderTime, setReminderTime] = useState('');
 
@@ -43,6 +45,7 @@ export const NoteEditor = ({ note, categories, isOpen, onClose, onSave }: NoteEd
       setContent(note.content);
       setCategory(note.category);
       setIsImportant(note.isImportant || false);
+      setIsChecked(note.isChecked || false);
       if (note.reminderDate) {
         const date = new Date(note.reminderDate);
         setReminderDate(date.toISOString().split('T')[0]);
@@ -56,6 +59,7 @@ export const NoteEditor = ({ note, categories, isOpen, onClose, onSave }: NoteEd
       setContent('');
       setCategory('personal');
       setIsImportant(false);
+      setIsChecked(false);
       setReminderDate('');
       setReminderTime('');
     }
@@ -69,8 +73,15 @@ export const NoteEditor = ({ note, categories, isOpen, onClose, onSave }: NoteEd
       reminder = new Date(`${reminderDate}T${reminderTime}`);
     }
     
-    onSave(title.trim() || 'Untitled Note', content, category, isImportant, reminder);
+    onSave(title.trim() || 'Untitled Note', content, category, isImportant, reminder, isChecked);
     onClose();
+  };
+
+  const handleDelete = () => {
+    if (note && onDelete) {
+      onDelete(note.id);
+      onClose();
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -98,6 +109,12 @@ export const NoteEditor = ({ note, categories, isOpen, onClose, onSave }: NoteEd
               {note ? 'Edit Note' : 'Create New Note'}
             </DialogTitle>
             <div className="flex items-center gap-2">
+              {note && onDelete && (
+                <Button variant="destructive" size="sm" onClick={handleDelete} className="gap-2">
+                  <Trash2 className="h-4 w-4" />
+                  Delete
+                </Button>
+              )}
               <Button onClick={handleSave} size="sm" className="gap-2">
                 <Save className="h-4 w-4" />
                 Save
@@ -150,6 +167,17 @@ export const NoteEditor = ({ note, categories, isOpen, onClose, onSave }: NoteEd
               {isImportant ? 'Important' : 'Mark Important'}
             </Button>
             
+            <Button
+              type="button"
+              variant={isChecked ? "default" : "outline"}
+              size="sm"
+              onClick={() => setIsChecked(!isChecked)}
+              className="gap-2"
+            >
+              <Check className={`h-4 w-4 ${isChecked ? 'fill-current' : ''}`} />
+              {isChecked ? 'Completed' : 'Mark Complete'}
+            </Button>
+            
             <div className="flex items-center gap-2">
               <Bell className="h-4 w-4 text-muted-foreground" />
               <Input
@@ -170,12 +198,14 @@ export const NoteEditor = ({ note, categories, isOpen, onClose, onSave }: NoteEd
             </div>
           </div>
           
-          <Textarea
-            placeholder="Start writing your note..."
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="flex-1 min-h-[400px] resize-none text-base leading-relaxed"
-          />
+          <div className="flex-1 min-h-0">
+            <Textarea
+              placeholder="Start writing your note..."
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="w-full h-full min-h-[300px] resize-none text-base leading-relaxed"
+            />
+          </div>
         </div>
         
         <div className="flex-shrink-0 text-xs text-muted-foreground">
